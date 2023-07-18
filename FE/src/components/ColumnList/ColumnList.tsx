@@ -12,9 +12,6 @@ export function ColumnList({ data }: { data: MainPageData | undefined }) {
         gap: "24px",
       }}>
       {data?.map((column) => <ColumnWrapper key={column.id} column={column} />)}
-      {/* <ColumnWrapper /> */}
-      {/* <ColumnWrapper /> */}
-      {/* <ColumnWrapper /> */}
     </div>
   );
 }

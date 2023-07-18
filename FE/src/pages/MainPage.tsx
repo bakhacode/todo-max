@@ -5,9 +5,12 @@ import { colors } from "../constants/colors";
 import { Alert } from "../components/Alert/Alert";
 import { ModalContext } from "../contexts/ModalContext";
 import { Dim } from "../components/Dim/Dim";
+import { CardContext } from "../contexts/CardContext";
 
 export function MainPage() {
-  const [mainPageData, setMainPageData] = useState<MainPageData>();
+  // const [mainPageData, setMainPageData] = useState<MainPageData>();
+  const CardContextValue = useContext(CardContext);
+  const { mainPageData, setMainPageData } = CardContextValue!;
   const modalContextValue = useContext(ModalContext);
   const { isAlertOpen, setIsAlertOpen } = modalContextValue!;
 
