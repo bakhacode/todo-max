@@ -17,8 +17,22 @@ export function ColumnWrapper({ column }: { column: Column }) {
     sharedDragRef,
     dragOverCardIdRef,
     sharedColumnId,
+    currentDragOverCardRef,
+    dragCardPosition,
+    currentDragCard,
+    isOverHalf,
+    setIsOverHalf,
+    currentDragOverColumnRef,
+    isCardOverRef,
+    isColumnOverRef,
+    isColumnOver,
+    setIsColumnOver,
+    isCardOver,
+    setIsCardOver,
+    draggingColumnRef,
+    sharedColumnRect,
   } = cardContextValue!;
-  const columnRef = useRef<HTMLDivElement>(null);
+  // const columnRef = useRef<HTMLDivElement>(null);
   const { setHistoryData } = useContext(ModalContext)!;
   const [isAddCard, setIsAddCard] = useState<boolean>(false);
   const [cardsList, setCardsList] = useState<Card[]>(column.cards); // column.cards
@@ -26,29 +40,51 @@ export function ColumnWrapper({ column }: { column: Column }) {
 
   const columnFromMainPage = mainPageData![column.id - 1];
 
-  const isRightColumnId = column.id === sharedColumnId;
+  const columnRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (columnRef.current) {
-      const rect = columnRef.current.getBoundingClientRect();
-      setColumnPositions((prev) => ({
-        ...prev,
-        [column.id]: {
-          columnId: column.id,
-          x: rect.x,
-          y: rect.y,
-          width: rect.width,
-          height: rect.height,
-          topLeft: { x: rect.left, y: rect.top },
-          topRight: { x: rect.right, y: rect.top },
-          bottomLeft: { x: rect.left, y: rect.bottom },
-          bottomRight: { x: rect.right, y: rect.bottom },
-        },
-      }));
+  const isDragCardColumn = currentDragCard.cardId === column.id;
+
+  const isDragOverColumn = useRef<boolean>(false);
+
+  const columnRect = columnRef.current?.getBoundingClientRect();
+
+  const isNotSameColumn = draggingColumnRef.current !== column.id;
+
+  if (columnRect) {
+    sharedColumnRect.current = {
+      ...sharedColumnRect.current,
+      [column.id]: columnRect,
+    };
+  }
+
+  // console.log(draggingColumnRef.current, column.id);
+  if (columnRect) {
+    const isInside =
+      dragCardPosition.cardMiddleX >= columnRect!.left &&
+      dragCardPosition.cardMiddleX <= columnRect!.right &&
+      dragCardPosition.cardMiddleY >= columnRect!.top &&
+      dragCardPosition.cardMiddleY <= columnRect!.bottom;
+
+    // if (isInside && currentDragOverColumnRef.current === column.id) {
+    //   setIsOverHalf(false);
+    //   console.log("자기 칼럼");
+    // }
+
+    if (isInside && currentDragOverColumnRef.current !== column.id) {
+      currentDragOverColumnRef.current = column.id;
+
+      // if (isInside && currentDragCard.columnId !== column.id) {
+      isDragOverColumn.current = true;
+      currentDragOverColumnRef.current = column.id;
+      setIsColumnOver(true);
+      setIsCardOver(false);
+      setIsOverHalf(true);
+      console.log("칼럼", column.id, "로", "들어왓어");
+      draggingColumnRef.current = column.id;
+      // }
     }
-  }, [columnRef, setColumnPositions, column.id]);
+  }
 
-  // const cardsCount = 10; // 두자리 수 모킹 값
   const showAddCard = () => {
     setIsAddCard(true);
   };
@@ -136,8 +172,11 @@ export function ColumnWrapper({ column }: { column: Column }) {
           updateEditCard={updateEditCard}
         />
       ))}
-      {canAddCardToColumn && isRightColumnId ? (
-        // {isAddToColumn && column.id === dragOverCardIdRef.current.columnId ? (
+      {/* {isDragOverColumn.current && */}
+      {/* currentDragOverColumnRef.current === column.id && */}
+      {isColumnOver &&
+      currentDragOverColumnRef.current === column.id &&
+      currentDragCard.columnId !== column.id ? (
         <CloneCard
           cloneType="to"
           cloneCardPosition={{ x: 0, y: 0 }}

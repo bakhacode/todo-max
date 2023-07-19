@@ -77,6 +77,45 @@ type CardContextType = {
   >;
   canAddCardToCard: boolean;
   setCanAddCardToCard: React.Dispatch<React.SetStateAction<boolean>>;
+  dragCardPosition: {
+    x: number;
+    y: number;
+    cardMiddleX: number;
+    cardMiddleY: number;
+    cardTop: number;
+  };
+  setDragCardPosition: React.Dispatch<
+    React.SetStateAction<{
+      x: number;
+      y: number;
+      cardMiddleX: number;
+      cardMiddleY: number;
+      cardTop: number;
+    }>
+  >;
+  currentDragCard: {
+    cardId: number;
+    columnId: number;
+  };
+  setCurrentDragCard: React.Dispatch<
+    React.SetStateAction<{
+      cardId: number;
+      columnId: number;
+    }>
+  >;
+  currentDragOverCardRef: React.MutableRefObject<{
+    cardId: number;
+    position: string;
+  }>;
+  currentDragOverColumnRef: React.MutableRefObject<number>;
+  isCardOverRef: React.MutableRefObject<boolean>;
+  isColumnOverRef: React.MutableRefObject<boolean>;
+  isColumnOver: boolean;
+  setIsColumnOver: React.Dispatch<React.SetStateAction<boolean>>;
+  isCardOver: boolean;
+  setIsCardOver: React.Dispatch<React.SetStateAction<boolean>>;
+  draggingColumnRef: React.MutableRefObject<number>;
+  sharedColumnRect: React.MutableRefObject<{ [columnId: number]: DOMRect }>;
 };
 
 export type Position = {
@@ -181,7 +220,38 @@ export function CardProvider({ children }: CardProviderProps) {
 
   const [isOverHalf, setIsOverHalf] = useState<boolean>(false);
 
+  const [dragCardPosition, setDragCardPosition] = useState({
+    x: 0,
+    y: 0,
+    cardMiddleX: 0,
+    cardMiddleY: 0,
+    cardTop: 0,
+  });
+
+  const [currentDragCard, setCurrentDragCard] = useState({
+    cardId: 0,
+    columnId: 0,
+  });
+  const currentDragOverCardRef = useRef({
+    cardId: 0,
+    position: "",
+  });
+
+  const currentDragOverColumnRef = useRef(0);
+
+  const isCardOverRef = useRef(false);
+  const [isCardOver, setIsCardOver] = useState(false);
+  const isColumnOverRef = useRef(false);
+  const [isColumnOver, setIsColumnOver] = useState(false);
+  const draggingColumnRef = useRef(0);
+
+  const sharedColumnRect = useRef<{ [columnId: number]: DOMRect }>({});
+
   const value: CardContextType = {
+    isCardOver,
+    setIsCardOver,
+    isColumnOver,
+    setIsColumnOver,
     mainPageData,
     setMainPageData,
     isDragging,
@@ -207,6 +277,16 @@ export function CardProvider({ children }: CardProviderProps) {
     setSharedCardId,
     canAddCardToCard,
     setCanAddCardToCard,
+    dragCardPosition,
+    setDragCardPosition,
+    currentDragCard,
+    setCurrentDragCard,
+    currentDragOverCardRef,
+    currentDragOverColumnRef,
+    isCardOverRef,
+    isColumnOverRef,
+    draggingColumnRef,
+    sharedColumnRect,
   };
 
   return <CardContext.Provider value={value}>{children}</CardContext.Provider>;
